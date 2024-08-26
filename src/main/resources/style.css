@@ -1,0 +1,74 @@
+.chart-content {
+  -fx-padding: 20px;
+}
+
+* {
+  -fx-shadow-highlight-color: transparent;
+}
+
+#cursorViewer {
+  -fx-font-size: 1.5em;
+
+}
+
+.chart-title {
+  -fx-text-fill: white;
+  /* Cool cyan color */
+  -fx-font-size: 2em;
+  /* Slightly larger font for emphasis */
+  -fx-font-weight: bold;
+  /* Bold title for better visibility */
+}
+
+.axis-label {
+  -fx-font-size: 1.4em;
+  /* Slightly smaller font size for axis labels */
+  -fx-text-fill: #e0e0e0;
+  /* Light gray for a softer look */
+}
+
+.menu-bar {
+  -fx-background-color: transparent !important;
+  -fx-border-color: transparent !important;
+}
+
+/* Reset styles for menu items */
+.menu-item {
+  -fx-background-color: transparent !important;
+  -fx-text-fill: black;
+  /* Or whatever text color you prefer */
+}
+
+/* Ensure menu items still react to hover or focus */
+.menu-item:hover,
+.menu-item:focused,
+.menu-item:selected {
+  -fx-background-color: -fx-background !important;
+  /* Keep default background */
+  -fx-text-fill: black;
+}
+
+.chart-legend {
+  -fx-background-color: transparent;
+  -fx-padding: 15px;
+  /* Reduced padding for a tighter layout */
+}
+
+.chart-legend-item-symbol {
+  -fx-background-radius: 5px;
+  /* Rounded corners for legend symbols */
+}
+
+.chart-legend-item {
+  -fx-text-fill: white;
+  -fx-font-size: 1.2em;
+  /* Slightly smaller font for the legend */
+}
+
+.chart-plot-background {
+  -fx-background-color: #121212;
+  /* Darker background for a modern look */
+  -fx-border-color: #ffffff;
+  /* Add a subtle border around the plot */
+  -fx-border-width: 1px;
+}
