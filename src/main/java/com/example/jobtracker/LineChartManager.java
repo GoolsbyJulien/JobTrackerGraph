@@ -1,8 +1,12 @@
 package com.example.jobtracker;
 
+import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.chart.*;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -10,25 +14,81 @@ import javafx.stage.Stage;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 
 public class LineChartManager extends Parent {
-    public XYChart.Series<String, Number> line1 = new XYChart.Series<String, Number>();
-    public XYChart.Series<String, Number> line2 = new XYChart.Series<String, Number>();
-
+    public XYChart.Series<String, Number> line1 = new XYChart.Series<>();
+    public XYChart.Series<String, Number> line2 = new XYChart.Series<>();
+    private static final String[] DAYS_OF_WEEK = {"Mon", "Tues", "Wed", "Thur", "Fri", "SAT", "SUN"};
 
     private LineChart<String, Number> currentChart;
 
-    public LineChartManager(Stage stage) {
+    public LineChartManager() {
         setCurrentChart(dailyJobsChart());
 
     }
 
+//    double mouseDragStartX, mouseDragStartY;
+//    double mouseDragEndX, mouseDragEndY;
+
     public LineChart<String, Number> dailyJobsChart() {
 
         LineChart<String, Number> lineChart = getBaseChart("Daily Jobs", "Day", "Number of Jobs");
+
+/*
+        lineChart.setOnMousePressed(mouseEvent -> {
+            mouseDragStartX = mouseEvent.getX();
+            mouseDragStartY = mouseEvent.getY();
+            mouseEvent.consume();
+        });
+        lineChart.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent mouseEvent) {
+                mouseDragEndX = mouseEvent.getX();
+                mouseDragEndY = mouseEvent.getY();
+
+                Point2D mouseSceneCoordsStart = new Point2D(mouseDragStartX, mouseDragStartY);
+                Point2D mouseSceneCoordsEnd = new Point2D(mouseDragEndX, mouseDragEndY);
+
+                double closestToStart = 1000;
+                double closestEnd = 1000;
+//
+//                XYChart.Data<String, Number> closestDataPoint = null;
+//                XYChart.Data<String, Number> closestDataPoint2 = null;
+
+
+                int closePointIndex = 0;
+                int closePointIndex2 = 0;
+
+                for (int i = 0; i < line1.getData().size(); i++) {
+                    XYChart.Data<String, Number> data = line1.getData().get(i);
+
+                    // Convert the data node's layout coordinates to scene coordinates for accurate comparison
+                    double dataNodeSceneX = data.getNode().localToScene(data.getNode().getBoundsInLocal()).getMinX();
+                    int startDist = (int) Math.abs(mouseSceneCoordsStart.getX() - dataNodeSceneX);
+                    int endDist = (int) Math.abs(mouseSceneCoordsEnd.getX() - dataNodeSceneX);
+
+                    if (startDist < closestToStart) {
+                        closestToStart = startDist;
+
+
+                        closePointIndex = i;
+                    }
+
+
+                    if (endDist < closestEnd) {
+                        closestEnd = endDist;
+
+                        closePointIndex2 = i;
+                    }
+                }
+                //  (Date) (currentChart.getXAxis()).upp
+                //              line1.setData(FXCollections.observableArrayList(line1.getData().subList(closePointIndex, closePointIndex2)));
+
+//                line2.setData(FXCollections.observableArrayList(line2.getData().subList(closePointIndex, closePointIndex2)));
+
+            }
+        });
+*/
 
         List<String> s = FileManager.getFileLines();
         int i = 0;
@@ -40,7 +100,7 @@ public class LineChartManager extends Parent {
 
             int value = Integer.parseInt(line.split(":")[1]);
             sum += value;
-            line1.getData().add(new XYChart.Data(date, value));
+            line1.getData().add(new XYChart.Data<>(date, value));
 
             line2.getData().add(new XYChart.Data<>(date, sum / (i + 1)));
             i++;
@@ -74,7 +134,7 @@ public class LineChartManager extends Parent {
             if (i >= lastWeekStart && i < thisWeekStart) {
 
 
-                line1.getData().add(new XYChart.Data(dayOfWeek(date), value));
+                line1.getData().add(new XYChart.Data<>(dayOfWeek(date), value));
 
             } else if (i >= thisWeekStart)
 
@@ -89,18 +149,29 @@ public class LineChartManager extends Parent {
         return lineChart;
     }
 
-    public String dayOfWeek(String s) {
+    public int dayOfWeekInt(String s) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate date = null;
+        LocalDate date;
         try {
             date = LocalDate.parse(s, formatter);
         } catch (Exception e) {
-            return "null";
+            return -1;
         }
         DayOfWeek dow = date.getDayOfWeek();  // Extracts a `DayOfWeek` enum object.
-        return dow.getDisplayName(TextStyle.SHORT, Locale.US);
+        System.out.println(dow.getValue());
+        return dow.getValue() - 1;
     }
+
+    public String dayOfWeek(String s) {
+
+        int dayOfWeek = dayOfWeekInt(s);
+        if (dayOfWeek != -1)
+            return DAYS_OF_WEEK[dayOfWeek];
+        else
+            return "Null";
+    }
+
 
     public LineChart<String, Number> weeklyTotalChart() {
         LineChart<String, Number> lineChart = getBaseChart("Weekly Total", "Week", "Number of Jobs Per Week");
@@ -122,7 +193,7 @@ public class LineChartManager extends Parent {
             if (i % 7 == 0) {
 
                 fullSum += sum;
-                line1.getData().add(new XYChart.Data(date, sum));
+                line1.getData().add(new XYChart.Data<>(date, sum));
 
                 line2.getData().add(new XYChart.Data<>(date, fullSum / (i + 1)));
                 sum = 0;
@@ -149,15 +220,16 @@ public class LineChartManager extends Parent {
 
     private LineChart<String, Number> getBaseChart(String title, String xAxisLabel, String YAxisLabel) {
 
-        line1 = new XYChart.Series<String, Number>();
-        line2 = new XYChart.Series<String, Number>();
+        line1 = new XYChart.Series<>();
+        line2 = new XYChart.Series<>();
 
         final CategoryAxis xAxis = new CategoryAxis();
         final NumberAxis yAxis = new NumberAxis();
+
         xAxis.setLabel(xAxisLabel);
         yAxis.setLabel(YAxisLabel);
         final LineChart<String, Number> lineChart =
-                new LineChart<String, Number>(xAxis, yAxis);
+                new LineChart<>(xAxis, yAxis);
         lineChart.setStyle("-fx-background-color: black; -fx-text-fill: white;");
         setOnMouseMove(lineChart);
         lineChart.setTitle(title);
@@ -168,7 +240,6 @@ public class LineChartManager extends Parent {
 
         line1.getData().clear();
         line2.getData().clear();
-
 
         return lineChart;
 
@@ -202,10 +273,21 @@ public class LineChartManager extends Parent {
                             }
                         }
 
+                        if (closestDataPoint == null || closestDataPoint2 == null)
+                            return;
 
-                        t.setText(
-                                closestDataPoint.getXValue() + "(" + dayOfWeek(closestDataPoint.getXValue()) + ")" + "\n" +
-                                        line1.getName() + " " + closestDataPoint.getYValue() + ", " + line2.getName() + closestDataPoint2.getYValue());
+                        if (dayOfWeek(closestDataPoint.getXValue()) != null) {
+
+                            t.setText(
+                                    closestDataPoint.getXValue() + "(" + dayOfWeek(closestDataPoint.getXValue()) + ")" + "\n" +
+                                            line1.getName() + " " + closestDataPoint.getYValue() + ", " + line2.getName() + closestDataPoint2.getYValue());
+                        } else {
+                            // TODO Display how many days ago the weekday was
+                            t.setText(
+                                    closestDataPoint.getXValue() + "\n" +
+                                            line1.getName() + " " + closestDataPoint.getYValue() + ", " + line2.getName() + closestDataPoint2.getYValue());
+
+                        }
 
                     } else {
                         Point2D mouseSceneCoords = new Point2D(event.getSceneX(), event.getSceneY());
@@ -227,10 +309,96 @@ public class LineChartManager extends Parent {
 
     Text t;
 
+    boolean showLine1 = true;
+    boolean showLine2 = true;
+
     public void setCurrentChart(LineChart<String, Number> stringNumberLineChart) {
         this.currentChart = stringNumberLineChart;
 
 
+        for (Node legend : currentChart.lookupAll(".chart-legend-item")) {
+
+            Label label = (Label) legend;
+
+            label.setOnMouseClicked(e -> {
+                System.out.println(label.getText());
+                if (label.getText().equals(line1.getName())) {
+
+                    if (showLine1) {
+                        for (XYChart.Data<String, Number> data : line1.getData()) {
+                            data.getNode().setOpacity(0); // Set opacity to 50%
+                        }
+                        label.setOpacity(0.5);
+                        line1.getNode().lookup(".chart-series-line").setStyle("-fx-opacity: 0.2;");
+
+                    } else {
+
+                        for (XYChart.Data<String, Number> data : line1.getData()) {
+                            data.getNode().setOpacity(1); // Set opacity to 50%
+                        }
+                        label.setOpacity(1);
+                        line1.getNode().lookup(".chart-series-line").setStyle("-fx-opacity: 1;");
+                    }
+                    showLine1 = !showLine1;
+                }
+                if (label.getText().equals(line2.getName())) {
+                    if (showLine2) {
+                        for (XYChart.Data<String, Number> data : line2.getData()) {
+                            data.getNode().setOpacity(0); // Set opacity to 50%
+                        }
+                        label.setOpacity(0.5);
+                        line2.getNode().lookup(".chart-series-line").setStyle("-fx-opacity: 0.2;");
+
+                    } else {
+
+                        for (XYChart.Data<String, Number> data : line2.getData()) {
+                            data.getNode().setOpacity(1); // Set opacity to 50%
+                        }
+                        label.setOpacity(1);
+                        line2.getNode().lookup(".chart-series-line").setStyle("-fx-opacity: 1;");
+                    }
+                    showLine2 = !showLine2;
+                }
+            });
+
+
+        }
+
+    }
+
+    Stage s = new Stage();
+
+    public void barStage() {
+        final CategoryAxis xAxis = new CategoryAxis();
+        final NumberAxis yAxis = new NumberAxis();
+        XYChart.Series<String, Number> series1 = new XYChart.Series<>();
+        int[] dailyAverages = {0, 0, 0, 0, 0, 0, 0};
+        int[] dailySum = {0, 0, 0, 0, 0, 0, 0};
+        int[] dailyNumber = {0, 0, 0, 0, 0, 0, 0};
+
+        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+
+        for (String line : FileManager.getFileLines()) {
+
+            String date = line.split(":")[0];
+            int dayOfWeekNum = dayOfWeekInt(date);
+            int value = Integer.parseInt(line.split(":")[1]);
+            dailySum[dayOfWeekNum] += value;
+            dailyNumber[dayOfWeekNum]++;
+            dailyAverages[dayOfWeekNum] = dailySum[dayOfWeekNum] / dailyNumber[dayOfWeekNum];
+        }
+
+        for (int i = 0; i < dailyAverages.length; i++) {
+            series1.getData().add(new XYChart.Data<>(DAYS_OF_WEEK[i], dailyAverages[i]));
+
+        }
+
+        barChart.getData().add(series1);
+
+        Scene sc = new Scene(barChart);
+        s.setScene(sc);
+
+        s.show();
     }
 
     public void setFollower(Text t) {

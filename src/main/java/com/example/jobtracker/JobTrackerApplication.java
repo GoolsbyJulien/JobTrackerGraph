@@ -3,11 +3,11 @@ package com.example.jobtracker;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.chart.*;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -16,19 +16,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.time.LocalDate;
 
-public class HelloApplication extends Application {
-
+public class JobTrackerApplication extends Application {
 
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) {
 
         //creating the chart
-
-        stage.setTitle("Line Chart Sample");
-
-        LineChartManager lm = new LineChartManager(stage);
+        stage.setTitle("Job Tracker //// " + LocalDate.now());
+        stage.setOnCloseRequest(t -> System.exit(0));
+        LineChartManager lm = new LineChartManager();
 
         final LineChart<String, Number> lineChart = lm.getCurrentChart();
 
@@ -72,13 +70,11 @@ public class HelloApplication extends Application {
         Menu menu = new Menu("Options");
 
         MenuItem toggleRollingAverage = new MenuItem("Toggle Rolling Average");
-        toggleRollingAverage.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
+        toggleRollingAverage.setOnAction(actionEvent -> {
 
+            lm.barStage();
 
-                actionEvent.consume();
-            }
+            actionEvent.consume();
         });
         menu.getItems().add(toggleRollingAverage);
         return menu;
@@ -90,46 +86,31 @@ public class HelloApplication extends Application {
 
 
         RadioMenuItem dailyChartView = new RadioMenuItem("Daily Chart");
-        dailyChartView.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
+        dailyChartView.setOnAction(actionEvent -> {
 
 
-                changeChart(sPane, lm, 0);
+            changeChart(sPane, lm, 0);
 
-                actionEvent.consume();
-            }
-
-
+            actionEvent.consume();
         });
 
 
         RadioMenuItem sevenDayView = new RadioMenuItem("Seven Day Chart");
-        sevenDayView.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
+        sevenDayView.setOnAction(actionEvent -> {
 
 
-                changeChart(sPane, lm, 1);
+            changeChart(sPane, lm, 1);
 
-                actionEvent.consume();
-            }
-
-
+            actionEvent.consume();
         });
 
         RadioMenuItem weeklyTotalView = new RadioMenuItem("Weekly Total Chart");
-        weeklyTotalView.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
+        weeklyTotalView.setOnAction(actionEvent -> {
 
 
-                changeChart(sPane, lm, 2);
+            changeChart(sPane, lm, 2);
 
-                actionEvent.consume();
-            }
-
-
+            actionEvent.consume();
         });
         weeklyTotalView.setToggleGroup(toggleGroup);
         sevenDayView.setToggleGroup(toggleGroup);
