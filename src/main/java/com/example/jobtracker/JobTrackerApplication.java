@@ -1,8 +1,6 @@
 package com.example.jobtracker;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -19,6 +17,10 @@ import javafx.stage.Stage;
 import java.time.LocalDate;
 
 public class JobTrackerApplication extends Application {
+
+    public static void main(String[] args) {
+        launch();
+    }
 
     @Override
     public void start(Stage stage) {
@@ -44,6 +46,7 @@ public class JobTrackerApplication extends Application {
 
         MenuBar menuBar = new MenuBar();
         Menu optionsMenu = getOptionsMenu(lm);
+        Menu windowsMenu = getWindowsMenu(lm);
 
         Menu viewMenu = geViewMenu(sPane, lm);
 
@@ -58,6 +61,7 @@ public class JobTrackerApplication extends Application {
 
         menuBar.getMenus().add(optionsMenu);
         menuBar.getMenus().add(viewMenu);
+        menuBar.getMenus().add(windowsMenu);
 
 
         scene.getStylesheets().add("style.css");
@@ -65,11 +69,24 @@ public class JobTrackerApplication extends Application {
         stage.show();
     }
 
-
     private static Menu getOptionsMenu(LineChartManager lm) {
-        Menu menu = new Menu("Options");
+        Menu menu = new Menu("Settings");
 
         MenuItem toggleRollingAverage = new MenuItem("Toggle Rolling Average");
+        toggleRollingAverage.setOnAction(actionEvent -> {
+
+            lm.barStage();
+
+            actionEvent.consume();
+        });
+        menu.getItems().add(toggleRollingAverage);
+        return menu;
+    }
+
+    private static Menu getWindowsMenu(LineChartManager lm) {
+        Menu menu = new Menu("Windows");
+
+        MenuItem toggleRollingAverage = new MenuItem("Daily Averages");
         toggleRollingAverage.setOnAction(actionEvent -> {
 
             lm.barStage();
@@ -158,9 +175,5 @@ public class JobTrackerApplication extends Application {
                 data.getNode().setVisible(!data.getNode().isVisible());  // Hides the dots
             }
         }
-    }
-
-    public static void main(String[] args) {
-        launch();
     }
 }

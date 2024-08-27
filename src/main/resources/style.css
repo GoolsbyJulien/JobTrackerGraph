@@ -10,7 +10,10 @@
   -fx-font-size: 1.5em;
 
 }
+.axis {
 
+-fx-tick-label-fill:white;
+}
 .chart-title {
   -fx-text-fill: white;
   /* Cool cyan color */
