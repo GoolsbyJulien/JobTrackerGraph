@@ -51,6 +51,8 @@
   -fx-text-fill: black;
 }
 
+
+
 .chart-legend {
   -fx-background-color: transparent;
   -fx-padding: 15px;
@@ -64,6 +66,11 @@
 
 .chart-legend-item {
   -fx-text-fill: white;
+  -fx-font-size: 1.2em;
+  /* Slightly smaller font for the legend */
+}
+.chart-legend-item:hover {
+  -fx-text-fill:#7e7e7e;
   -fx-font-size: 1.2em;
   /* Slightly smaller font for the legend */
 }

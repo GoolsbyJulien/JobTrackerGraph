@@ -1,22 +1,34 @@
 package com.example.jobtracker;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class FileManager {
-    public static List<String> getFileLines() {
 
-        List<String> lines;
+
+    public static String filePath = "Software Developer.search";
+
+    public static void openFile() {
+        ProcessBuilder pb = new ProcessBuilder("Notepad.exe", filePath);
         try {
-            lines = Files.readAllLines(Paths.get("Software Developer.search"));
+            pb.start();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<String> getFileLines() {
+
+        Profiler p = new Profiler("Read file");
+        List<String> lines;
+        try {
+            lines = Files.readAllLines(Paths.get(filePath));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        p.printTimeMill();
         return lines;
     }
 }
